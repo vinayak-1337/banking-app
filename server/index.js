@@ -13,7 +13,7 @@ const db = mysql.createConnection({
 	database: "banking"
 })
 
-app.post('/getuser', (req, res) => {
+app.post('/login', (req, res) => {
 	const { username, password } = req.body;
 	db.query(
 		`SELECT * FROM users WHERE username='${username}' AND password='${password}'`,

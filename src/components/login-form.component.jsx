@@ -2,6 +2,7 @@ import {useState, useContext} from "react";
 import FormInput from "./form-input.component";
 import Axios from "axios";
 import { UserContext } from "../context/user.context";
+import {useNavigate} from "react-router-dom";
 
 const defaultFormField = {
 	username: "",
@@ -9,9 +10,10 @@ const defaultFormField = {
 }
 
 export default function LoginForm() {
-	const [formField, setFormField] = useState(defaultFormField);
-	const {username, password} = formField;
-	const { currentUser, setCurrentUser} = useContext(UserContext);
+	const [ formField, setFormField ] = useState(defaultFormField);
+	const { username, password } = formField;
+	const { currentUser, setCurrentUser } = useContext(UserContext);
+	const navigate = useNavigate();
 
 	const handleChange = (event) => {
 		const {name, value} = event.target;
@@ -22,11 +24,28 @@ export default function LoginForm() {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		Axios.post(
-			'http://localhost:3001/getuser', 
-			{...formField}
-		).then((res)=>console.log(res.data));
+		try {
+			Axios.post(
+				'http://localhost:3001/login', 
+				{...formField}
+				).then((res)=> {
+					console.log("response", res.data);
+					if (res.data[0]) {
+						const { name, balance } = res.data[0];
+						setCurrentUser({ 
+					 		username: name, 
+					 		balance: balance,
+				 		})
+				 		navigate("/")
+					} else {
+						alert("incorrect username or password");
+					}				
+				});
+		} catch (error) {
+			console.log(error);
+		}
 	}
+	// console.log(currentUser);
 
 	return (
     <form className="form-container" onSubmit={handleSubmit}>
