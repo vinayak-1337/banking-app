@@ -1,6 +1,7 @@
 import {useState, useContext} from "react";
 import FormInput from "./form-input.component";
 import Axios from "axios";
+import {useNavigate} from "react-router-dom";
 
 const defaultFormField = {
 	name: "",
@@ -8,13 +9,13 @@ const defaultFormField = {
 	contact: "",
 	username: "",
 	password: "",
-	balance: 0,
 }
 
 export default function RegisterForm() {
 	const [formField, setFormField] = useState(defaultFormField);
-	const {name, age, contact, username, password, balance} = formField;
-
+	const {name, age, contact, username, password} = formField;
+	const navigate = useNavigate();
+ 
 	const handleChange = (event) => {
 		const {name, value} = event.target;
 		setFormField({
@@ -34,6 +35,7 @@ export default function RegisterForm() {
 		}
 		setFormField(defaultFormField);
 		alert("Registration successfull");
+		navigate("/login");
 	}
 
 	return (
@@ -43,7 +45,6 @@ export default function RegisterForm() {
       <FormInput name="contact" type="tel" value={contact} onChange= {handleChange}/>
       <FormInput name="username" type="text" value={username} onChange= {handleChange}/>
       <FormInput name="password" type="password" value={password} onChange= {handleChange}/>
-      <FormInput name="balance" type="number" value={balance} onChange= {handleChange}/>
       <FormInput type="submit" value="submit"/>
     </form>
 	)

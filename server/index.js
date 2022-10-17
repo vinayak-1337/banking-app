@@ -28,10 +28,10 @@ app.post('/getuser', (req, res) => {
 })
 
 app.post('/create', (req, res)=> {
-	const {name, age, contact, username, password, balance} = req.body;
+	const {name, age, contact, username, password} = req.body;
 	db.query(
-		'INSERT INTO users (name, age, contact, username, password, balance) VALUES (?,?,?,?,?,?)',
-		[name, age, contact, username, password, balance],
+		'INSERT INTO users (name, age, contact, username, password) VALUES (?,?,?,?,?)',
+		[name, age, contact, username, password],
 		(err, result) => {
 			if(err) {
 				console.log(err)
