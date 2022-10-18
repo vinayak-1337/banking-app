@@ -29,7 +29,6 @@ export default function LoginForm() {
 				'http://localhost:3001/login', 
 				{...formField}
 				).then((res)=> {
-					console.log("response", res.data);
 					if (res.data) {
 						const { id, name, username, balance } = res.data;
 						setCurrentUser({ 
@@ -47,7 +46,6 @@ export default function LoginForm() {
 			console.log(error);
 		}
 	}
-	console.log(currentUser);
 
 	return (
     <form className="form-container" onSubmit={handleSubmit}>

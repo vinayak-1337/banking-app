@@ -70,14 +70,21 @@ app.post('/create', (req, res)=> {
 	)
 })
 
-// app.post('/deposit', (req,res) => {
-// 	const { id, amount } = req.body;
-// 	db.query(
-// 		'SELECT balance FROM user_balance WHERE user_id = ?',
-// 		[id],
-
-// 	)
-// })
+app.post('/deposit', ( req, res ) => {
+	const { id, updatedBalance } = req.body;
+	console.log({reqBody: req.body});
+	db.query(
+		'UPDATE user_balance SET balance=? WHERE user_id=?',
+		[updatedBalance, id],
+		(err, result) => {
+			if(err) {
+				console.log(err);
+			} else {
+				console.log("result", result);
+			}
+		}
+	)
+})
 
 app.listen(3001, ()=>{
 	console.log("Hello all okay");

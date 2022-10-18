@@ -1,35 +1,39 @@
-import {useState} from "react";
+import {useState, useContext} from "react";
 import FormInput from "./form-input.component";
 import Axios from "axios";
+import { UserContext } from "../context/user.context";
 
 const defaultFormField = {
-	username: null,
-	amount: null,
+	amount: 0,
 }
 
 export default function DipositForm() {
 	const [formField, setFormField] = useState(defaultFormField);
 	const { amount } = formField;
+	const {currentUser, setCurrentUser} = useContext(UserContext);
+	const {id, balance } = currentUser;
+	console.log(currentUser);
 
 	const handleChange = (event) => {
-		const {name, value} = event.target;
+		const {value} = event.target;
+		console.log(value);
 		setFormField({
-			...formField, [name]: value
+			amount: parseInt(value),
 		});
 	}
-
+	console.log({amount, balance});
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		try {
 			Axios.post(
-			'http://localhost:3001/create', 
-			{...formField})
+			'http://localhost:3001/deposit', 
+			{id: id, updatedBalance: balance + amount })
 			.then((res) => console.log(res.data));
 		} catch (error) {
 			console.log(error);
 		}
+		setCurrentUser({...currentUser, balance: balance + amount })
 		setFormField(defaultFormField);
-		alert("Registration successfull");
 		// navigate("/login");
 	}
 

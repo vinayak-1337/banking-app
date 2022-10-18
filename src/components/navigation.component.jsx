@@ -13,7 +13,6 @@ export default function Navigation() {
 			balance: null,
 		})
 	}
-	console.log(currentUser);
 	return (
 		<div className="navigation-container">
 			{currentUser.username ? 
