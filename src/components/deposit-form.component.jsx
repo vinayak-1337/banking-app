@@ -4,7 +4,7 @@ import Axios from "axios";
 import { UserContext } from "../context/user.context";
 
 const defaultFormField = {
-	amount: 0,
+	amount: "",
 }
 
 export default function DipositForm() {
@@ -12,16 +12,13 @@ export default function DipositForm() {
 	const { amount } = formField;
 	const {currentUser, setCurrentUser} = useContext(UserContext);
 	const {id, balance } = currentUser;
-	console.log(currentUser);
 
 	const handleChange = (event) => {
 		const {value} = event.target;
-		console.log(value);
 		setFormField({
 			amount: parseInt(value),
 		});
 	}
-	console.log({amount, balance});
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		try {
@@ -39,7 +36,16 @@ export default function DipositForm() {
 
 	return (
 		<form className="form-container" onSubmit={handleSubmit}>
-      <FormInput name="amount" type="number" value={amount} onChange= {handleChange}/>
+      <FormInput
+      	name="amount"
+      	type="number"
+      	value={amount}
+      	onChange= {handleChange}
+      	required
+      	step="500"
+      	min="500"
+      	max="50000"
+      />
       <FormInput type="submit" value="submit"/>
     </form>
 	)
