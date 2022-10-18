@@ -30,13 +30,15 @@ export default function LoginForm() {
 				{...formField}
 				).then((res)=> {
 					console.log("response", res.data);
-					if (res.data[0]) {
-						const { name, balance } = res.data[0];
+					if (res.data) {
+						const { id, name, username, balance } = res.data;
 						setCurrentUser({ 
-					 		username: name, 
-					 		balance: balance,
-				 		})
-				 		navigate("/")
+							id,
+					 		username,
+					 		name,
+					 		balance,
+				 		});
+				 		navigate("/");
 					} else {
 						alert("incorrect username or password");
 					}				
@@ -45,7 +47,7 @@ export default function LoginForm() {
 			console.log(error);
 		}
 	}
-	// console.log(currentUser);
+	console.log(currentUser);
 
 	return (
     <form className="form-container" onSubmit={handleSubmit}>

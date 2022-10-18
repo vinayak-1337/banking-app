@@ -15,14 +15,33 @@ const db = mysql.createConnection({
 
 app.post('/login', (req, res) => {
 	const { username, password } = req.body;
+	let userId = null;
+	const responseResult = {};
 	db.query(
 		`SELECT * FROM users WHERE username='${username}' AND password='${password}'`,
 		(err, result) => {
+			const {id, username, name} = result[0];
+			userId = id;
+			console.log(userId);
 			if(err) {
 				console.log(err);
 			} else {
-				res.send(result);
+				responseResult.id = id;
+				responseResult.name = name;
+				responseResult.username = username;
 			}
+			db.query(
+				`SELECT * FROM user_balance WHERE user_id=?`,
+				[userId],
+				( err, result ) => {
+					if(err){
+						console.log(err);
+						} else {
+							responseResult.balance = result[0].balance;
+							res.send(responseResult);
+						}
+					}
+			)
 		}
 	);
 })
@@ -36,11 +55,29 @@ app.post('/create', (req, res)=> {
 			if(err) {
 				console.log(err)
 			} else {
-				res.send("user created ")
+				// res.send("user created ")
 			}
 		}
 	);
+	db.query(`SELECT * FROM users WHERE username='${username}' AND password='${password}'`,
+		(err, result) => {
+			if(err) {
+				console.log(err);
+			} else {
+				db.query(`INSERT INTO user_balance (user_id) VALUES (?)`, [result[0].id])
+			}
+		}
+	)
 })
+
+// app.post('/deposit', (req,res) => {
+// 	const { id, amount } = req.body;
+// 	db.query(
+// 		'SELECT balance FROM user_balance WHERE user_id = ?',
+// 		[id],
+
+// 	)
+// })
 
 app.listen(3001, ()=>{
 	console.log("Hello all okay");

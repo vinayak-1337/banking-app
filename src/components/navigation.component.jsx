@@ -7,15 +7,21 @@ export default function Navigation() {
 	const { currentUser, setCurrentUser } = useContext(UserContext);
 	const handleClick = () => {
 		setCurrentUser({
+			id: null,
+			name: null,
 			username: null,
-			balance: null
+			balance: null,
 		})
 	}
+	console.log(currentUser);
 	return (
 		<div className="navigation-container">
 			{currentUser.username ? 
 				<>
-					<h2>Hello, {currentUser.username} </h2>
+					<h2>Hello, {currentUser.name} </h2>
+					<Link className="nav-link" to="balance">Balance</Link>
+			 		<Link className="nav-link" to="deposit">Deposit</Link>
+			 		<Link className="nav-link" to="transfer">Transfer Money</Link>
 			 		<button className="nav-link" onClick={handleClick}>Log out</button>
 				</> : 
 			<>
@@ -23,10 +29,6 @@ export default function Navigation() {
 				<Link className="nav-link" to="/register">Register</Link>
 			<Link className="nav-link" to="/login">Login</Link>
 			</>}
-			
-			<Link className="nav-link" to="transfer">
-				Transfer Money
-			</Link>
 		</div>
 	)
 }
