@@ -31,7 +31,7 @@ export default function DipositForm() {
 		}
 		setCurrentUser({...currentUser, balance: balance + amount })
 		setFormField(defaultFormField);
-		// navigate("/login");
+		alert("Deposit Successfull")
 	}
 
 	return (

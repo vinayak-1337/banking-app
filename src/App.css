@@ -55,7 +55,16 @@ input[type="submit"] {
   /*margin-top: 20px;*/
 }
 
-label {
+button {
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+label, .user-name {
   text-transform: capitalize;
 }
 

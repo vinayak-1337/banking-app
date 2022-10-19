@@ -17,7 +17,7 @@ export default function Navigation() {
 		<div className="navigation-container">
 			{currentUser.username ? 
 				<>
-					<h2>Hello, {currentUser.name} </h2>
+					<h2>Hello, <span className="user-name">{currentUser.name}</span> </h2>
 					<Link className="nav-link" to="balance">Balance</Link>
 			 		<Link className="nav-link" to="deposit">Deposit</Link>
 			 		<Link className="nav-link" to="transfer">Transfer Money</Link>
