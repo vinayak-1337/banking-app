@@ -65,14 +65,41 @@ exports.loginUser = (req, res) => {
     }
   );
 };
+
 exports.depositMoney = (req, res) => {
-  const { id, updatedBalance } = req.body;
+  const { id, amount } = req.body;
   connection.query(
-    "UPDATE user_balance SET balance=? WHERE user_id=?",
-    [updatedBalance, id],
+    "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
+    [amount, id],
     (err, result) => {
       if (err) console.log(err);
       res.send(result);
+    }
+  );
+};
+
+exports.transferMoney = (req, res) => {
+  const { senderId, recieverUsername, amount } = req.body;
+  connection.query(
+    "SELECT id FROM users WHERE username=?",
+    [recieverUsername],
+    (err, result) => {
+      if (err) return res.send(err);
+      connection.query(
+        "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
+        [amount, result[0].id],
+        (err, result) => {
+          if (err) return res.send(err);
+          connection.query(
+            "UPDATE user_balance SET balance=balance-? WHERE user_id=?",
+            [amount, senderId],
+            (err, result) => {
+              if (err) return res.send(err);
+              return res.send(result);
+            }
+          );
+        }
+      );
     }
   );
 };
