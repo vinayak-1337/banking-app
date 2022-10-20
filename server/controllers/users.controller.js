@@ -1,51 +1,58 @@
 const connection = require("../config/database");
-// const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 // const express = require('express');
 
-exports.createUser = (req, res) => {
+exports.createUser = async (req, res) => {
   const { name, age, contact, username, password } = req.body;
-  let sql1 =
-    "INSERT INTO users (name, age, contact, username, password) VALUES (?,?,?,?,?);";
-  let sql2 = "SELECT id from users WHERE username=? AND password=?";
-  connection.query(
-    sql1 + sql2,
-    [name, age, contact, username, password, username, password],
-    (err, results) => {
-      if (err) console.log(err);
-      // res.send(results[1]);
-      console.log(results[1][0].id);
-      connection.query(
-        "INSERT INTO user_balance (user_id) VALUES (?)",
-        [results[1][0].id],
-        (err, results) => {
-          if (err) console.log(err);
-          res.send(results);
-        }
-      );
-    }
-  );
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    let sql1 =
+      "INSERT INTO users (name, age, contact, username, password) VALUES (?,?,?,?,?);";
+    let sql2 = "SELECT id from users WHERE username=?";
+    connection.query(
+      sql1 + sql2,
+      [name, age, contact, username, hashedPassword, username],
+      (err, results) => {
+        if (err) console.log(err);
+        connection.query(
+          "INSERT INTO user_balance (user_id) VALUES (?)",
+          [results[1][0].id],
+          (err, results) => {
+            if (err) console.log(err);
+            res.send(results);
+          }
+        );
+      }
+    );
+  } catch (error) {}
 };
 
 exports.loginUser = (req, res) => {
   const { username, password } = req.body;
-  let userId = null;
   const responseResult = {};
   connection.query(
-    `SELECT * FROM users WHERE username='${username}' AND password='${password}'`,
-    (err, result) => {
-      const { id, username, name } = result[0];
-      userId = id;
-      console.log(userId);
-      if (err) {
-        console.log(err);
-      } else {
-        responseResult.id = id;
-        responseResult.name = name;
-        responseResult.username = username;
+    `SELECT * FROM users WHERE username='${username}'`,
+    async (err, result) => {
+      if (!result.length) return res.send("user not found");
+      try {
+        if (await bcrypt.compare(password, result[0].password)) {
+          const { id, username, name } = result[0];
+          if (err) {
+            console.log(err);
+          } else {
+            responseResult.id = id;
+            responseResult.name = name;
+            responseResult.username = username;
+          }
+        } else {
+          return res.send("incorrect password");
+        }
+      } catch (error) {
+        console.log(error);
       }
       connection.query(
         `SELECT * FROM user_balance WHERE user_id=?`,
-        [userId],
+        [result[0].id],
         (err, result) => {
           if (err) {
             console.log(err);
