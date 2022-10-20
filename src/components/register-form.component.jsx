@@ -27,15 +27,20 @@ export default function RegisterForm() {
   const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      Axios.post("http://localhost:3001/create", { ...formField }).then((res) =>
-        console.log(res.data)
+      Axios.post("http://localhost:3001/create", { ...formField }).then(
+        (res) => {
+          if (res.data.code === "ER_DUP_ENTRY") {
+            alert("User already exist. Please choose different username");
+          } else {
+            setFormField(defaultFormField);
+            alert("Registration successfull");
+            navigate("/login");
+          }
+        }
       );
     } catch (error) {
-      console.log(error);
+      console.log("error", error);
     }
-    setFormField(defaultFormField);
-    alert("Registration successfull");
-    navigate("/login");
   };
 
   return (

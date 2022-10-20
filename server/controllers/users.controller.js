@@ -13,7 +13,7 @@ exports.createUser = async (req, res) => {
       sql1 + sql2,
       [name, age, contact, username, hashedPassword, username],
       (err, results) => {
-        if (err) console.log(err);
+        if (err) return res.send(err);
         connection.query(
           "INSERT INTO user_balance (user_id) VALUES (?)",
           [results[1][0].id],
