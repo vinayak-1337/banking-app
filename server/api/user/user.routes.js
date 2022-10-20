@@ -6,7 +6,7 @@ const {
   depositMoney,
 } = require("../../controllers/users.controller");
 
-router.post("/created", createUser);
+router.post("/create", createUser);
 router.post("/login", loginUser);
 router.post("/deposit", depositMoney);
 
