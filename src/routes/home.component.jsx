@@ -1,4 +1,3 @@
-import RegisterForm from "../components/register-form.component";
 import { Outlet, Link } from "react-router-dom";
 // import logo1 from '../assets/icon-1.png';
 // import logo2 from '../assets/icon-2.png';
