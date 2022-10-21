@@ -57,11 +57,13 @@ export default function MoneyTransfer() {
         type="text"
         value={reciever}
         onChange={handleChange}
+        required
       />
       <FormInput
         name="amount"
         type="number"
         value={amount}
+        min="100"
         onChange={handleChange}
       />
       <FormInput type="submit" value="Transfer" />
