@@ -1,7 +1,8 @@
 import Axios from "axios";
 import { useState, useContext } from "react";
-import FormInput from "./form-input.component";
-import { UserContext } from "../context/user.context";
+import FormInput from "../form-input/form-input.component";
+import { UserContext } from "../../context/user.context";
+import BackButton from "../back-button/back-button.component";
 
 const defaultFormField = {
   reciever: "",
@@ -50,23 +51,26 @@ export default function MoneyTransfer() {
   };
 
   return (
-    <form className="form-container" onSubmit={handleSubmit}>
-      <FormInput
-        name="reciever"
-        info="username"
-        type="text"
-        value={reciever}
-        onChange={handleChange}
-        required
-      />
-      <FormInput
-        name="amount"
-        type="number"
-        value={amount}
-        min="100"
-        onChange={handleChange}
-      />
-      <FormInput type="submit" value="Transfer" />
-    </form>
+    <div className="transfer-container">
+      <form className="form-container" onSubmit={handleSubmit}>
+        <FormInput
+          name="reciever"
+          info="username"
+          type="text"
+          value={reciever}
+          onChange={handleChange}
+          required
+        />
+        <FormInput
+          name="amount"
+          type="number"
+          value={amount}
+          min="100"
+          onChange={handleChange}
+        />
+        <FormInput type="submit" value="Transfer" />
+      </form>
+      <BackButton/>
+    </div>
   );
 }

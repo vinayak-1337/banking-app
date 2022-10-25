@@ -1,7 +1,8 @@
 import { useState, useContext } from "react";
-import FormInput from "./form-input.component";
+import FormInput from "../form-input/form-input.component";
 import Axios from "axios";
-import { UserContext } from "../context/user.context";
+import { UserContext } from "../../context/user.context";
+import BackButton from "../back-button/back-button.component";
 
 const defaultFormField = {
   amount: "",
@@ -35,18 +36,21 @@ export default function DipositForm() {
   };
 
   return (
-    <form className="form-container" onSubmit={handleSubmit}>
-      <FormInput
-        name="amount"
-        type="number"
-        value={amount}
-        onChange={handleChange}
-        required
-        step="500"
-        min="500"
-        max="50000"
-      />
-      <FormInput type="submit" value="submit" />
-    </form>
+    <div className="deposit-container">
+      <form className="form-container" onSubmit={handleSubmit}>
+        <FormInput
+          name="amount"
+          type="number"
+          value={amount}
+          onChange={handleChange}
+          required
+          step="500"
+          min="500"
+          max="50000"
+        />
+        <FormInput type="submit" value="submit" />
+      </form>
+      <BackButton/>
+    </div>
   );
 }

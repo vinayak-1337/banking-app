@@ -7,9 +7,14 @@ export default function Home() {
   return (
     <>
       <header className="App-header">
-        <Link to="/">
-          <h1 id="title">Some Bank</h1>
-        </Link>
+        <div className="left">
+          <Link to="/">
+            <h1 id="title">Secure Bank</h1>
+          </Link>
+        </div>
+        <div className="right">
+
+        </div>
       </header>
       <main>
         <Outlet />

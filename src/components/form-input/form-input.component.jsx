@@ -1,3 +1,4 @@
+import "./form-input.styles.css";
 
 export default function FormInput({name, info, ...otherProps}) {
 	return (

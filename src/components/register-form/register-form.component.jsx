@@ -1,5 +1,5 @@
 import { useState } from "react";
-import FormInput from "./form-input.component";
+import FormInput from "../form-input/form-input.component";
 import Axios from "axios";
 import { useNavigate } from "react-router-dom";
 
