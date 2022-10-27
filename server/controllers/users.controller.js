@@ -4,27 +4,48 @@ const bcrypt = require("bcrypt");
 
 exports.createUser = async (req, res) => {
   const { name, age, contact, username, password } = req.body;
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    let sql1 =
-      "INSERT INTO users (name, age, contact, username, password) VALUES (?,?,?,?,?);";
-    let sql2 = "SELECT id from users WHERE username=?";
-    connection.query(
-      sql1 + sql2,
-      [name, age, contact, username, hashedPassword, username],
-      (err, results) => {
-        if (err) return res.send(err);
-        connection.query(
-          "INSERT INTO user_balance (user_id) VALUES (?)",
-          [results[1][0].id],
-          (err, results) => {
-            if (err) console.log(err);
-            res.send(results);
-          }
-        );
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  connection.getConnection((err, trx) => {
+    trx.beginTransaction((err) => {
+      if (err) {
+        throw err;
       }
-    );
-  } catch (error) {}
+      let sql1 =
+        "INSERT INTO users (name, age, contact, username, password) VALUES (?,?,?,?,?);";
+      let sql2 = "SELECT id from users WHERE username=?";
+      trx.query(
+        sql1 + sql2,
+        [name, age, contact, username, hashedPassword, username],
+        (err, results) => {
+          if (err) {
+            return trx.rollback(() => {
+              res.send(err);
+            });
+          }
+          trx.query(
+            "INSERT INTO user_balance (user_id) VALUES (?)",
+            [results[1][0].id],
+            (err, results) => {
+              if (err) {
+                return trx.rollback(() => {
+                  throw err;
+                });
+              }
+              trx.commit(() => {
+                if (err) {
+                  return trx.rollback(() => {
+                    throw err;
+                  });
+                }
+              });
+              res.send(results);
+            }
+          );
+        }
+      );
+    });
+  });
 };
 
 exports.loginUser = (req, res) => {
@@ -80,26 +101,75 @@ exports.depositMoney = (req, res) => {
 
 exports.transferMoney = (req, res) => {
   const { senderId, recieverUsername, amount } = req.body;
-  connection.query(
-    "SELECT id FROM users WHERE username=?",
-    [recieverUsername],
-    (err, result) => {
-      if (err) return res.send(err);
-      connection.query(
-        "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
-        [amount, result[0].id],
+
+  connection.getConnection((err,trx) => {
+    trx.beginTransaction((err)=> {
+      if (err) {
+        throw err;
+      }
+      trx.query(
+        "SELECT id FROM users WHERE username=?",
+        [recieverUsername],
         (err, result) => {
-          if (err) return res.send(err);
-          connection.query(
-            "UPDATE user_balance SET balance=balance-? WHERE user_id=?",
-            [amount, senderId],
+          if (err) {
+            return trx.rollback(() => {
+              res.send(err);
+            });
+          };
+          trx.query(
+            "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
+            [amount, result[0].id],
             (err, result) => {
-              if (err) return res.send(err);
-              return res.send(result);
+              if (err) {
+                return trx.rollback(() => {
+                  res.send(err);
+                });
+              };
+              trx.query(
+                "UPDATE user_balance SET balance=balance-? WHERE user_id=?",
+                [amount, senderId],
+                (err, result) => {
+                  if (err) {
+                    return trx.rollback(() => {
+                      res.send(err);
+                    });
+                  };
+                  trx.commit(() => {
+                    if (err) {
+                      return trx.rollback(() => {
+                        throw err;
+                      });
+                    }
+                  });
+                  return res.send(result);
+                }
+              );
             }
           );
         }
       );
-    }
-  );
+    })
+  })
+  // connection.query(
+  //   "SELECT id FROM users WHERE username=?",
+  //   [recieverUsername],
+  //   (err, result) => {
+  //     if (err) return res.send(err);
+  //     connection.query(
+  //       "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
+  //       [amount, result[0].id],
+  //       (err, result) => {
+  //         if (err) return res.send(err);
+  //         connection.query(
+  //           "UPDATE user_balance SET balance=balance-? WHERE user_id=?",
+  //           [amount, senderId],
+  //           (err, result) => {
+  //             if (err) return res.send(err);
+  //             return res.send(result);
+  //           }
+  //         );
+  //       }
+  //     );
+  //   }
+  // );
 };

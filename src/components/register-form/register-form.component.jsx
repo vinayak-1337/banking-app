@@ -33,7 +33,7 @@ export default function RegisterForm() {
             alert("User already exist. Please choose different username");
           } else {
             setFormField(defaultFormField);
-            alert("Registration successfull");
+            alert("Registration successful");
             navigate("/login");
           }
         }

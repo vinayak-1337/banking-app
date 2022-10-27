@@ -14,9 +14,4 @@ const connection = createPool({
   multipleStatements: true,
 });
 
-// db.query("select * from users", function (error, results, fields) {
-//   if (error) throw error;
-//   console.log(results);
-// });
-
 module.exports = connection;
