@@ -100,7 +100,7 @@ exports.depositMoney = (req, res) => {
 };
 
 exports.transferMoney = (req, res) => {
-  const { senderId, recieverUsername, amount } = req.body;
+  const { senderId, receiverUsername, amount } = req.body;
 
   connection.getConnection((err,trx) => {
     trx.beginTransaction((err)=> {
@@ -109,7 +109,7 @@ exports.transferMoney = (req, res) => {
       }
       trx.query(
         "SELECT id FROM users WHERE username=?",
-        [recieverUsername],
+        [receiverUsername],
         (err, result) => {
           if (err) {
             return trx.rollback(() => {
