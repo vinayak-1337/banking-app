@@ -102,8 +102,8 @@ exports.depositMoney = (req, res) => {
 exports.transferMoney = (req, res) => {
   const { senderId, receiverUsername, amount } = req.body;
 
-  connection.getConnection((err,trx) => {
-    trx.beginTransaction((err)=> {
+  connection.getConnection((err, trx) => {
+    trx.beginTransaction((err) => {
       if (err) {
         throw err;
       }
@@ -115,7 +115,10 @@ exports.transferMoney = (req, res) => {
             return trx.rollback(() => {
               res.send(err);
             });
-          };
+          }
+          if (result.length == 0) {
+            return res.status(404).send("user not found");
+          }
           trx.query(
             "UPDATE user_balance SET balance=balance+? WHERE user_id=?",
             [amount, result[0].id],
@@ -124,7 +127,7 @@ exports.transferMoney = (req, res) => {
                 return trx.rollback(() => {
                   res.send(err);
                 });
-              };
+              }
               trx.query(
                 "UPDATE user_balance SET balance=balance-? WHERE user_id=?",
                 [amount, senderId],
@@ -133,7 +136,7 @@ exports.transferMoney = (req, res) => {
                     return trx.rollback(() => {
                       res.send(err);
                     });
-                  };
+                  }
                   trx.commit(() => {
                     if (err) {
                       return trx.rollback(() => {
@@ -148,8 +151,8 @@ exports.transferMoney = (req, res) => {
           );
         }
       );
-    })
-  })
+    });
+  });
   // connection.query(
   //   "SELECT id FROM users WHERE username=?",
   //   [recieverUsername],

@@ -3,6 +3,7 @@ import FormInput from "../form-input/form-input.component";
 import Axios from "axios";
 import { UserContext } from "../../context/user.context";
 import { Link, useNavigate } from "react-router-dom";
+import ModalBox from "../modal-box/modal-box.component";
 
 const defaultFormField = {
   username: "",
@@ -11,6 +12,8 @@ const defaultFormField = {
 
 export default function LoginForm() {
   const [formField, setFormField] = useState(defaultFormField);
+  const [showModal, setShowModal] = useState(false);
+  const [modalValue, setModalValue] = useState("");
   const { username, password } = formField;
   const { setCurrentUser } = useContext(UserContext);
   const navigate = useNavigate();
@@ -23,29 +26,28 @@ export default function LoginForm() {
     });
   };
 
+  const modalAlert = (message) => {
+    setModalValue(message);
+    setShowModal(true);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    try {
-      Axios.post("http://localhost:3001/login", { ...formField }).then(
-        (res) => {
-          if (typeof res.data === "object") {
-            console.log(res.data);
-            const { id, name, username, balance } = res.data;
-            setCurrentUser({
-              id,
-              username,
-              name,
-              balance,
-            });
-            navigate("/");
-          } else {
-            alert("incorrect username or password");
-          }
-        }
-      );
-    } catch (error) {
-      console.log(error);
-    }
+    Axios.post("http://localhost:3001/login", { ...formField }).then((res) => {
+      if (typeof res.data === "object") {
+        console.log(res.data);
+        const { id, name, username, balance } = res.data;
+        setCurrentUser({
+          id,
+          username,
+          name,
+          balance,
+        });
+        navigate("/");
+      } else {
+        modalAlert("Incorrect username or password!");
+      }
+    });
   };
 
   return (
@@ -68,6 +70,13 @@ export default function LoginForm() {
       <p>
         First Time User? <Link to="register">Register Here</Link>
       </p>
+      <ModalBox
+        onClose={() => {
+          setShowModal(false);
+        }}
+        value={modalValue}
+        show={showModal}
+      />
     </div>
   );
 }

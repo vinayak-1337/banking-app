@@ -3,12 +3,15 @@ import FormInput from "../form-input/form-input.component";
 import Axios from "axios";
 import { UserContext } from "../../context/user.context";
 import BackButton from "../back-button/back-button.component";
+import ModalBox from "../modal-box/modal-box.component";
 
 const defaultFormField = {
   amount: "",
 };
 
 export default function DipositForm() {
+  const [showModal, setShowModal] = useState(false);
+  const [modalValue, setModalValue] = useState("");
   const [formField, setFormField] = useState(defaultFormField);
   const { amount } = formField;
   const { currentUser, setCurrentUser } = useContext(UserContext);
@@ -20,19 +23,23 @@ export default function DipositForm() {
       amount: parseInt(value),
     });
   };
+
+  const modalAlert = (message) => {
+    setModalValue(message);
+    setShowModal(true);
+  };
+  
   const handleSubmit = (event) => {
     event.preventDefault();
-    try {
-      Axios.post("http://localhost:3001/deposit", {
-        id: id,
-        amount: amount,
-      }).then((res) => console.log(res.data));
-    } catch (error) {
-      console.log(error);
-    }
+
+    Axios.post("http://localhost:3001/deposit", {
+      id: id,
+      amount: amount,
+    }).then((res) => console.log(res.data));
+
     setCurrentUser({ ...currentUser, balance: balance + amount });
     setFormField(defaultFormField);
-    alert("Deposit Successfull");
+    modalAlert("Deposit Successful");
   };
 
   return (
@@ -50,7 +57,14 @@ export default function DipositForm() {
         />
         <FormInput type="submit" value="submit" />
       </form>
-      <BackButton/>
+      <BackButton />
+      <ModalBox
+        onClose={() => {
+          setShowModal(false);
+        }}
+        value={modalValue}
+        show={showModal}
+      />
     </div>
   );
 }

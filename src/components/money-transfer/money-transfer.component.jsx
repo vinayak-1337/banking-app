@@ -3,16 +3,19 @@ import { useState, useContext } from "react";
 import FormInput from "../form-input/form-input.component";
 import { UserContext } from "../../context/user.context";
 import BackButton from "../back-button/back-button.component";
+import ModalBox from "../modal-box/modal-box.component";
 
 const defaultFormField = {
-  reciever: "",
+  receiver: "",
   amount: 0,
 };
 
 export default function MoneyTransfer() {
   const [formField, setFormField] = useState(defaultFormField);
+  const [showModal, setShowModal] = useState(false);
+  const [modalValue, setModalValue] = useState("");
   const { currentUser, setCurrentUser } = useContext(UserContext);
-  const { reciever, amount } = formField;
+  const { receiver, amount } = formField;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -22,42 +25,49 @@ export default function MoneyTransfer() {
     });
   };
 
+  const modalAlert = (message) => {
+    setModalValue(message);
+    setShowModal(true);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (reciever === currentUser.username) {
-      alert("for self transfer use deposit option");
+    if (receiver === currentUser.username) {
+      modalAlert("For self transfer use deposit option");
       return;
     }
     if (amount > currentUser.balance) {
-      alert("insufficient funds");
+      modalAlert("Insufficient funds");
       return;
     }
-    try {
-      Axios.post("http://localhost:3001/transfer", {
-        senderId: currentUser.id,
-        recieverUsername: reciever,
-        amount: amount,
-      }).then((res) => {
-        console.log(res);
+    Axios.post("http://localhost:3001/transfer", {
+      senderId: currentUser.id,
+      receiverUsername: receiver,
+      amount: amount,
+    })
+      .then((res) => {
+        console.log(res.data);
         setCurrentUser({
           ...currentUser,
           balance: currentUser.balance - amount,
         });
-        alert("transfer successfull");
+        modalAlert("Transfer successful");
+      })
+      .catch((err) => {
+        if (err.response.status === 404) {
+          modalAlert("User not found");
+        }
       });
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
     <div className="transfer-container">
       <form className="form-container" onSubmit={handleSubmit}>
         <FormInput
-          name="reciever"
+          name="receiver"
           info="username"
           type="text"
-          value={reciever}
+          value={receiver}
           onChange={handleChange}
           required
         />
@@ -70,7 +80,14 @@ export default function MoneyTransfer() {
         />
         <FormInput type="submit" value="Transfer" />
       </form>
-      <BackButton/>
+      <BackButton />
+      <ModalBox
+        onClose={() => {
+          setShowModal(false);
+        }}
+        value={modalValue}
+        show={showModal}
+      />
     </div>
   );
 }
